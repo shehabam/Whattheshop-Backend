@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Product, Profile
+from .models import Product
 from rest_framework_jwt.settings import api_settings
 
 
