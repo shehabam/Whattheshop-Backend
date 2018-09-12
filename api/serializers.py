@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Product
+from .models import Product, Order, MiddleMan, Category
 from rest_framework_jwt.settings import api_settings
 
 
@@ -29,10 +29,40 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 # LIST SERIALIZER
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["username"]
+
 
 class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['name', 'description', 'img', 'price', 'id']
 
-# DETAIL SERIALIZER
+class CategorySerializer(serializers.ModelSerializer):
+    items = serializers.SerializerMethodField()
+    class Meta:
+        model = Category
+        fields = '__all__'
+
+    def get_items(self, obj):
+        items = obj.product_set.all()
+        return ItemSerializer(items, many=True).data
+
+
+
+
+class MiddleManSerializer(serializers.ModelSerializer):
+    product = ItemSerializer()
+    class Meta:
+        model = MiddleMan
+        fields = ['quantity', 'product']
+
+class OrderListSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    middleman_set = MiddleManSerializer(many=True)
+
+    class Meta:
+        model = Order
+        exclude = ['products']

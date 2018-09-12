@@ -5,15 +5,23 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.conf import settings
 
+class Category(models.Model):
+    category_name = models.CharField(max_length=120)
+
+    def __str__(self):
+        return self.category_name
+
 
 class Product(models.Model):
     name = models.CharField(max_length=120)
     price = models.IntegerField()
     description = models.TextField()
     img = models.ImageField(null=True, blank=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE,null=True)
 
     def __str__(self):
         return self.name
+
 
 
 class Order(models.Model):
@@ -26,6 +34,7 @@ class MiddleMan(models.Model):
     quantity = models.PositiveIntegerField()
     order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
+    
 
 
 # It creates a new Profile and associate it with the newly created User.
